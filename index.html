@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulado Enem – Matemática e Ciências da Natureza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface-alt: #f0eee8;
+      --primary: #01696f;
+      --primary-dark: #0c4e54;
+      --danger: #a12c7b;
+      --text: #222222;
+      --muted: #666666;
+      --border: #d4d1ca;
+      --radius: 10px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 960px;
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 24px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      background: var(--surface-alt);
+      border-radius: 999px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .badge-value {
+      font-weight: 600;
+    }
+
+    .timer {
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 800px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .quiz-card, .leaderboard-card {
+      background: var(--surface-alt);
+      border-radius: var(--radius);
+      padding: 16px 16px 18px;
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .quiz-header h2 {
+      font-size: 1rem;
+    }
+
+    .quiz-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .question-area {
+      margin-top: 6px;
+    }
+
+    .question-area h3 {
+      font-size: 0.98rem;
+      margin-bottom: 8px;
+    }
+
+    .question-area .area-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e1f5f6;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
+
+    .options {
+      list-style: none;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .option-btn {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    }
+
+    .option-key {
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 20px;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-btn:hover {
+      background: #fdfcf8;
+      transform: translateY(-1px);
+    }
+
+    .option-btn.selected {
+      border-color: var(--primary);
+      background: #e5f4f5;
+    }
+
+    .option-btn.correct {
+      border-color: #2e7d32;
+      background: #e8f5e9;
+    }
+
+    .option-btn.incorrect {
+      border-color: var(--danger);
+      background: #fde3f1;
+    }
+
+    .feedback {
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    .feedback.ok {
+      color: #2e7d32;
+    }
+
+    .feedback.bad {
+      color: var(--danger);
+    }
+
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.05s;
+    }
+
+    .button-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .button-primary:disabled {
+      background: #9cb8ba;
+      cursor: not-allowed;
+    }
+
+    .button-outline {
+      background: transparent;
+      color: var(--primary-dark);
+      border: 1px solid var(--primary-dark);
+    }
+
+    .button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .leaderboard-card h2 {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .leaderboard-card p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin-top: 6px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 4px 2px;
+      text-align: left;
+    }
+
+    .leaderboard-table th {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .leaderboard-empty {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .save-result {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .save-result label {
+      font-weight: 600;
+    }
+
+    .save-result input {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    .final-result {
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    .final-result strong {
+      font-weight: 700;
+    }
+
+    .pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <div class="logo">
+          <svg viewBox="0 0 32 32" aria-label="Logo Enem Quiz">
+            <circle cx="16" cy="16" r="14" fill="none" stroke="#01696f" stroke-width="2"></circle>
+            <path d="M8 18c3-6 7-9 14-6" fill="none" stroke="#01696f" stroke-width="2"></path>
+            <circle cx="12" cy="12" r="2" fill="#01696f"></circle>
+          </svg>
+          <div>
+            <div class="logo-title">Simulado Enem</div>
+            <div class="subtitle">Matemática e Ciências da Natureza</div>
+          </div>
+        </div>
+      </div>
+      <div class="status-bar">
+        <div class="badge">
+          <span class="badge-label">Questão</span>
+          <span class="badge-value" id="question-counter">– / 20</span>
+        </div>
+        <div class="badge">
+          <span class="badge-label">Placar</span>
+          <span class="badge-value" id="score-display">0 acertos</span>
+        </div>
+        <div class="badge">
+          <span class="badge-label">Tempo</span>
+          <span class="badge-value timer" id="timer-display">20:00</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="quiz-card">
+        <div class="quiz-header">
+          <h2>Questão atual</h2>
+          <span class="pill" id="area-pill">Área –</span>
+        </div>
+
+        <div class="quiz-meta">
+          Resolva a questão, selecione uma alternativa e avance para a próxima. O simulado termina ao final da 20ª questão ou quando o tempo zerar.
+        </div>
+
+        <div class="question-area">
+          <span class="area-tag" id="area-tag">Área –</span>
+          <h3 id="question-text">Clique em “Iniciar simulado” para começar.</h3>
+          <ul class="options" id="options-list"></ul>
+          <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="controls">
+          <button class="button button-outline" id="start-btn">
+            Iniciar simulado
+          </button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="progress-text" id="progress-text">0 / 20 concluídas</span>
+            <button class="button button-primary" id="next-btn" disabled>
+              Próxima questão
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="leaderboard-card">
+        <h2>Leaderboard (sessão atual)</h2>
+        <p>
+          Ao finalizar o simulado, informe seu nome para aparecer no ranking local.
+          O ranking é ordenado por número de acertos e, em caso de empate, por menor tempo gasto.
+        </p>
+
+        <div class="final-result" id="final-result">
+          Termine o simulado para ver seu desempenho aqui.
+        </div>
+
+        <div class="save-result">
+          <label for="player-name">Nome para o ranking:</label>
+          <input type="text" id="player-name" placeholder="Ex.: Maria, João, Estudante 01" />
+          <button class="button button-primary" id="save-btn" disabled>
+            Salvar no ranking
+          </button>
+        </div>
+
+        <div id="leaderboard-container">
+          <p class="leaderboard-empty">Nenhum resultado salvo nesta sessão ainda.</p>
+          <table class="leaderboard-table" id="leaderboard-table" style="display:none;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>Acertos</th>
+                <th>Tempo</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Configurações principais
+    const TOTAL_QUESTOES = 20;
+    const DURACAO_SEGUNDOS = 20 * 60; // 20 minutos
+
+    // Banco de questões (autoral, inspirado em estilo de Enem)
+    const questions = [
+      // MATEMÁTICA (10)
+      {
+        id: 1,
+        area: "Matemática",
+        text: "Um estudante acertou 12 das 20 questões de um simulado. Qual a porcentagem de acertos?",
+        options: ["40%", "50%", "60%", "70%"],
+        correctIndex: 2
+      },
+      {
+        id: 2,
+        area: "Matemática",
+        text: "Um produto custa 80 reais e sofre um aumento de 15%. O novo preço é:",
+        options: ["90,00", "92,00", "92,50", "94,00"],
+        correctIndex: 2
+      },
+      {
+        id: 3,
+        area: "Matemática",
+        text: "A função f(x) = 2x + 5 representa o custo (em reais) de um serviço em função do número de horas x. O custo para 3 horas é:",
+        options: ["9", "10", "11", "12"],
+        correctIndex: 3
+      },
+      {
+        id: 4,
+        area: "Matemática",
+        text: "Um terreno retangular mede 10 m por 18 m. A área desse terreno é, em metros quadrados:",
+        options: ["28", "90", "108", "180"],
+        correctIndex: 2
+      },
+      {
+        id: 5,
+        area: "Matemática",
+        text: "Em uma aula com 40 alunos, 60% são meninas. O número de meninas é:",
+        options: ["18", "20", "22", "24"],
+        correctIndex: 3
+      },
+      {
+        id: 6,
+        area: "Matemática",
+        text: "Um gráfico mostra que uma população dobra a cada 10 anos. Se hoje há 50 mil habitantes, em 20 anos haverá aproximadamente:",
+        options: ["75 mil", "100 mil", "150 mil", "200 mil"],
+        correctIndex: 3
+      },
+      {
+        id: 7,
+        area: "Matemática",
+        text: "O valor de 3^2 + 4^2 é:",
+        options: ["12", "18", "25", "32"],
+        correctIndex: 2
+      },
+      {
+        id: 8,
+        area: "Matemática",
+        text: "Uma empresa vende pacotes de internet de 50 GB por 80 reais. O preço por GB, em reais, é aproximadamente:",
+        options: ["1,20", "1,40", "1,60", "1,80"],
+        correctIndex: 1
+      },
+      {
+        id: 9,
+        area: "Matemática",
+        text: "Um número natural é múltiplo de 6 e de 9 ao mesmo tempo. O menor número com essa propriedade, maior que zero, é:",
+        options: ["18", "24", "27", "36"],
+        correctIndex: 0
+      },
+      {
+        id: 10,
+        area: "Matemática",
+        text: "Em uma sequência aritmética, o primeiro termo é 5 e a razão é 3. O quinto termo dessa sequência é:",
+        options: ["14", "15", "17", "18"],
+        correctIndex: 3
+      },
+
+      // CIÊNCIAS DA NATUREZA (10)
+      {
+        id: 11,
+        area: "Ciências da Natureza",
+        text: "A água passa do estado líquido para o gasoso, à temperatura ambiente, sem atingir a ebulição. Esse processo é chamado de:",
+        options: ["Fusão", "Solidificação", "Evaporação", "Condensação"],
+        correctIndex: 2
+      },
+      {
+        id: 12,
+        area: "Ciências da Natureza",
+        text: "Em uma reação química, a soma das massas dos reagentes é igual à soma das massas dos produtos. Esse enunciado está relacionado ao princípio de:",
+        options: [
+          "Inércia",
+          "Conservação da carga elétrica",
+          "Conservação da massa",
+          "Ação e reação"
+        ],
+        correctIndex: 2
+      },
+      {
+        id: 13,
+        area: "Ciências da Natureza",
+        text: "O gás responsável principalmente pelo efeito estufa intensificado pelas atividades humanas é:",
+        options: ["Oxigênio (O₂)", "Dióxido de carbono (CO₂)", "Nitrogênio (N₂)", "Hélio (He)"],
+        correctIndex: 1
+      },
+      {
+        id: 14,
+        area: "Ciências da Natureza",
+        text: "A unidade usada no Sistema Internacional (SI) para medir energia é:",
+        options: ["Watt", "Joule", "Newton", "Volt"],
+        correctIndex: 1
+      },
+      {
+        id: 15,
+        area: "Ciências da Natureza",
+        text: "O DNA está localizado principalmente:",
+        options: [
+          "No citoplasma das células procarióticas apenas",
+          "No núcleo das células eucarióticas",
+          "Nas mitocôndrias apenas",
+          "Na parede celular"
+        ],
+        correctIndex: 1
+      },
+      {
+        id: 16,
+        area: "Ciências da Natureza",
+        text: "Uma lâmpada incandescente transforma, predominantemente, energia:",
+        options: [
+          "Elétrica em cinética",
+          "Elétrica em luminosa e térmica",
+          "Térmica em luminosa",
+          "Potencial em cinética"
+        ],
+        correctIndex: 1
+      },
+      {
+        id: 17,
+        area: "Ciências da Natureza",
+        text: "Os seres vivos que produzem seu próprio alimento por fotossíntese são chamados de:",
+        options: ["Heterótrofos", "Parasitas", "Autótrofos", "Detritívoros"],
+        correctIndex: 2
+      },
+      {
+        id: 18,
+        area: "Ciências da Natureza",
+        text: "O uso excessivo de fertilizantes nitrogenados na agricultura pode levar principalmente à:",
+        options: [
+          "Diminuição da acidez do solo",
+          "Eutrofização de rios e lagos",
+          "Redução do efeito estufa",
+          "Diminuição da produtividade agrícola"
+        ],
+        correctIndex: 1
+      },
+      {
+        id: 19,
+        area: "Ciências da Natureza",
+        text: "O som é um tipo de onda que necessita de um meio material para se propagar. Portanto, ele é classificado como:",
+        options: ["Onda mecânica", "Onda eletromagnética", "Onda estacionária", "Onda transversal obrigatoriamente"],
+        correctIndex: 0
+      },
+      {
+        id: 20,
+        area: "Ciências da Natureza",
+        text: "A camada de ozônio na estratosfera é importante porque:",
+        options: [
+          "Aumenta a temperatura da superfície da Terra",
+          "Impede a entrada de oxigênio na atmosfera",
+          "Filtra parte da radiação ultravioleta do Sol",
+          "Impede a formação de nuvens"
+        ],
+        correctIndex: 2
+      }
+    ];
+
+    // Estado do quiz
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+    let timerInterval = null;
+    let timeRemaining = DURACAO_SEGUNDOS;
+    let quizStarted = false;
+    let quizFinished = false;
+
+    // Leaderboard em memória
+    let leaderboard = [];
+
+    // Referências de elementos
+    const questionCounterEl = document.getElementById("question-counter");
+    const scoreDisplayEl = document.getElementById("score-display");
+    const timerDisplayEl = document.getElementById("timer-display");
+    const areaTagEl = document.getElementById("area-tag");
+    const areaPillEl = document.getElementById("area-pill");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsListEl = document.getElementById("options-list");
+    const feedbackEl = document.getElementById("feedback");
+    const startBtnEl = document.getElementById("start-btn");
+    const nextBtnEl = document.getElementById("next-btn");
+    const progressTextEl = document.getElementById("progress-text");
+    const finalResultEl = document.getElementById("final-result");
+    const playerNameInput = document.getElementById("player-name");
+    const saveBtnEl = document.getElementById("save-btn");
+    const leaderboardBodyEl = document.getElementById("leaderboard-body");
+    const leaderboardTableEl = document.getElementById("leaderboard-table");
+    const leaderboardEmptyEl = document.querySelector(".leaderboard-empty");
+
+    function formatSeconds(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function updateTimerDisplay() {
+      timerDisplayEl.textContent = formatSeconds(timeRemaining);
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          timeRemaining = 0;
+          updateTimerDisplay();
+          if (!quizFinished) {
+            endQuiz("Tempo esgotado. O simulado foi encerrado automaticamente.");
+          }
+          return;
+        }
+        timeRemaining -= 1;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function resetQuizState() {
+      currentIndex = 0;
+      score = 0;
+      answered = false;
+      quizFinished = false;
+      timeRemaining = DURACAO_SEGUNDOS;
+      updateTimerDisplay();
+      scoreDisplayEl.textContent = "0 acertos";
+      progressTextEl.textContent = "0 / " + TOTAL_QUESTOES + " concluídas";
+      finalResultEl.textContent = "Termine o simulado para ver seu desempenho aqui.";
+      saveBtnEl.disabled = true;
+      playerNameInput.value = "";
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      questionCounterEl.textContent = (currentIndex + 1) + " / " + TOTAL_QUESTOES;
+      areaTagEl.textContent = q.area;
+      areaPillEl.textContent = q.area;
+      questionTextEl.textContent = q.text;
+      optionsListEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+      answered = false;
+      nextBtnEl.disabled = true;
+
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      q.options.forEach((opt, idx) => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn";
+        btn.dataset.index = idx;
+
+        const spanKey = document.createElement("span");
+        spanKey.className = "option-key";
+        spanKey.textContent = letters[idx] || "";
+
+        const spanText = document.createElement("span");
+        spanText.className = "option-text";
+        spanText.textContent = opt;
+
+        btn.appendChild(spanKey);
+        btn.appendChild(spanText);
+        btn.addEventListener("click", () => handleOptionClick(idx));
+
+        li.appendChild(btn);
+        optionsListEl.appendChild(li);
+      });
+    }
+
+    function handleOptionClick(selectedIndex) {
+      if (answered || !quizStarted || quizFinished) return;
+
+      answered = true;
+      const q = questions[currentIndex];
+      const buttons = optionsListEl.querySelectorAll(".option-btn");
+      buttons.forEach((btn, idx) => {
+        btn.classList.remove("selected", "correct", "incorrect");
+        if (idx === selectedIndex) {
+          btn.classList.add("selected");
+        }
+      });
+
+      if (selectedIndex === q.correctIndex) {
+        score += 1;
+        feedbackEl.textContent = "Resposta correta!";
+        feedbackEl.classList.add("ok");
+        feedbackEl.classList.remove("bad");
+      } else {
+        feedbackEl.textContent = "Resposta incorreta. A alternativa correta foi marcada em verde.";
+        feedbackEl.classList.add("bad");
+        feedbackEl.classList.remove("ok");
+      }
+
+      buttons[q.correctIndex].classList.add("correct");
+      if (selectedIndex !== q.correctIndex) {
+        buttons[selectedIndex].classList.add("incorrect");
+      }
+
+      scoreDisplayEl.textContent = score + " acertos";
+      progressTextEl.textContent = (currentIndex + 1) + " / " + TOTAL_QUESTOES + " concluídas";
+      nextBtnEl.disabled = false;
+
+      // Se for a última questão, já mudar texto do botão
+      if (currentIndex === TOTAL_QUESTOES - 1) {
+        nextBtnEl.textContent = "Finalizar simulado";
+      } else {
+        nextBtnEl.textContent = "Próxima questão";
+      }
+    }
+
+    function goToNextQuestion() {
+      if (!answered || quizFinished) return;
+      if (currentIndex < TOTAL_QUESTOES - 1) {
+        currentIndex += 1;
+        renderQuestion();
+      } else {
+        endQuiz("Simulado concluído. Parabéns pelo esforço!");
+      }
+    }
+
+    function endQuiz(mensagem) {
+      quizFinished = true;
+      clearInterval(timerInterval);
+      nextBtnEl.disabled = true;
+
+      const respondidas = currentIndex + 1;
+      const textoResumo =
+        `Você respondeu ${respondidas} de ${TOTAL_QUESTOES} questões, com ` +
+        `${score} acertos.`;
+
+      finalResultEl.innerHTML =
+        `<strong>Resultado final:</strong> ${textoResumo}<br>` +
+        (mensagem ? mensagem : "");
+
+      // Habilita salvar no ranking
+      saveBtnEl.disabled = false;
+    }
+
+    function renderLeaderboard() {
+      if (leaderboard.length === 0) {
+        leaderboardEmptyEl.style.display = "block";
+        leaderboardTableEl.style.display = "none";
+        return;
+      }
+      leaderboardEmptyEl.style.display = "none";
+      leaderboardTableEl.style.display = "table";
+
+      leaderboardBodyEl.innerHTML = "";
+      leaderboard.forEach((entry, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdPos = document.createElement("td");
+        tdPos.textContent = idx + 1;
+
+        const tdName = document.createElement("td");
+        tdName.textContent = entry.name;
+
+        const tdScore = document.createElement("td");
+        tdScore.textContent = entry.score + "/" + TOTAL_QUESTOES;
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = formatSeconds(entry.timeUsed);
+
+        const tdDate = document.createElement("td");
+        tdDate.textContent = entry.date;
+
+        tr.appendChild(tdPos);
+        tr.appendChild(tdName);
+        tr.appendChild(tdScore);
+        tr.appendChild(tdTime);
+        tr.appendChild(tdDate);
+        leaderboardBodyEl.appendChild(tr);
+      });
+    }
+
+    function handleSaveResult() {
+      if (!quizFinished) return;
+      const name = (playerNameInput.value || "").trim() || "Estudante";
+      const timeUsed = DURACAO_SEGUNDOS - timeRemaining;
+      const entry = {
+        name,
+        score,
+        timeUsed,
+        date: new Date().toLocaleDateString("pt-BR")
+      };
+      leaderboard.push(entry);
+      leaderboard.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.timeUsed - b.timeUsed;
+      });
+      leaderboard = leaderboard.slice(0, 10);
+      renderLeaderboard();
+      saveBtnEl.disabled = true;
+    }
+
+    function startQuiz() {
+      resetQuizState();
+      quizStarted = true;
+      startTimer();
+      renderQuestion();
+      startBtnEl.textContent = "Reiniciar simulado";
+      nextBtnEl.disabled = true;
+    }
+
+    // Eventos
+    startBtnEl.addEventListener("click", startQuiz);
+    nextBtnEl.addEventListener("click", goToNextQuestion);
+    saveBtnEl.addEventListener("click", handleSaveResult);
+
+    // Estado inicial
+    updateTimerDisplay();
+    renderLeaderboard();
+  </script>
+</body>
+</html>
